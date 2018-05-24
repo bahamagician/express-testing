@@ -4,7 +4,6 @@ const app = express();
 
 app.use(express.json());
 
-
 // Create Courses Array
 const courses = [
   { id: 1, name: "Course 1" },
@@ -25,11 +24,7 @@ app.get("/api/courses", (req, res) => {
 // Add New Course Route
 app.post("/api/courses", (req, res) => {
   const { error } = validateCourse(req.body);
-  if (error) {
-    res.status(400).send(error.details[0].message);
-    return;
-  }
-
+  if (error) return res.status(400).send(error.details[0].message);
 
   const course = {
     id: courses.length + 1,
@@ -41,17 +36,13 @@ app.post("/api/courses", (req, res) => {
 
 // Update a course
 app.put("/api/courses/:id", (req, res) => {
-
   // Look up course and return 404 if it doesn't exist
   const course = courses.find(c => c.id === parseInt(req.params.id));
-  if (!course) res.status(404).send("That course was not found");
+  if (!course) return res.status(404).send("That course was not found");
 
   // Validate course and if it's invalid, return 400 - Bad Request
   const { error } = validateCourse(req.body);
-  if (error) {
-    res.status(400).send(error.details[0].message);
-    return;
-  }
+  if (error) return res.status(400).send(error.details[0].message);
 
   // Update the course
   course.name = req.body.name;
@@ -69,10 +60,9 @@ function validateCourse(course) {
 
 // Delete a Course
 app.delete("/api/courses/:id", (req, res) => {
-
   // Look up course and return 404 if it doesn't exist
   const course = courses.find(c => c.id === parseInt(req.params.id));
-  if (!course) res.status(404).send("That course was not found");
+  if (!course) return res.status(404).send("That course was not found");
 
   // Delete the course
   const index = courses.indexOf(course);
@@ -80,16 +70,14 @@ app.delete("/api/courses/:id", (req, res) => {
 
   // Return the course
   res.send(course);
-
 });
 
 // Get Single Course Route
 app.get("/api/courses/:id", (req, res) => {
   const course = courses.find(c => c.id === parseInt(req.params.id));
-  if (!course) res.status(404).send("That course was not found");
+  if (!course) return res.status(404).send("That course was not found");
   res.send(course);
 });
-
 
 // Set port from env variable or default ot 3000
 const port = process.env.PORT || 3000;
